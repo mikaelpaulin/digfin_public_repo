@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Workflow — Anomaly Alert &amp; Drill-down · twoday</title>
+<style>
+  :root{
+    --primary:#000000;
+    --accent:#FFBF00;
+    --accent-deep:#CC9900;
+    --olive:#898D61;
+    --olive-deep:#6E7049;
+    --tan:#C6AA91;
+    --taupe:#A58D77;
+    --muted:#838383;
+    --line:#E6E2E0;
+    --surface:#F0ECEB;
+    --card:#FFFFFF;
+    --ink:#1A1A1A;
+    --danger:#C0392B;
+    --danger-soft:#FBEDEC;
+    --font:Arial,'Helvetica Neue',Helvetica,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
+  body{
+    font-family:var(--font);
+    color:var(--ink);
+    background:var(--surface);
+    -webkit-font-smoothing:antialiased;
+    display:flex;
+    justify-content:center;
+    padding:32px 24px;
+  }
+  .slide{
+    width:100%;
+    max-width:1280px;
+    background:var(--card);
+    border-radius:4px;
+    box-shadow:0 8px 40px rgba(0,0,0,.10);
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+  }
+
+  /* ---- furniture ---- */
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:18px 40px 0 40px;}
+  .page-chip{background:var(--accent);color:#000;font-weight:700;font-size:13px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:3px;}
+  .wordmark{font-weight:700;font-size:15px;letter-spacing:.2px;}
+  .hairline{height:2px;background:var(--primary);margin:14px 40px 0 40px;}
+
+  /* ---- header ---- */
+  .head{padding:30px 40px 4px 40px;}
+  .eyebrow{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--olive-deep);margin-bottom:10px;}
+  .head h1{font-size:32px;font-weight:700;line-height:1.12;color:var(--primary);}
+  .head .accent-bar{display:inline-block;width:46px;height:5px;background:var(--accent);margin-top:14px;border-radius:2px;}
+  .head p{margin-top:14px;font-size:15px;color:var(--muted);max-width:820px;}
+
+  /* ---- persona strip ---- */
+  .persona-strip{
+    display:flex;align-items:center;gap:16px;
+    margin:22px 40px 4px 40px;padding:14px 18px;
+    background:var(--surface);border-radius:8px;border-left:5px solid var(--accent);
+  }
+  .persona-strip .avatar{width:58px;height:58px;flex:0 0 auto;}
+  .ps-meta{display:flex;flex-direction:column;gap:2px;}
+  .ps-role{font-size:10.5px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--olive-deep);}
+  .ps-name{font-size:17px;font-weight:700;color:var(--primary);}
+  .ps-quote{font-size:13px;color:var(--muted);font-style:italic;margin-top:2px;}
+  .ps-tag{margin-left:auto;text-align:right;font-size:11px;color:var(--muted);line-height:1.5;}
+  .ps-tag b{color:var(--ink);}
+
+  /* ---- workflow rail ---- */
+  .flow-wrap{padding:18px 40px 10px 40px;}
+  .flow-label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--primary);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+  .flow-label::before{content:"";width:14px;height:14px;background:var(--accent);border-radius:2px;}
+  .flow-label .hint{margin-left:auto;font-weight:600;letter-spacing:.3px;text-transform:none;color:var(--muted);font-size:11px;}
+
+  .flow{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;align-items:stretch;}
+  @media(max-width:980px){.flow{grid-template-columns:repeat(3,1fr);}}
+  @media(max-width:560px){.flow{grid-template-columns:1fr;}}
+
+  .step{
+    position:relative;
+    border:1px solid var(--line);
+    border-top:4px solid var(--stepcolor,var(--accent));
+    border-radius:8px;background:var(--card);
+    padding:16px 14px 14px 14px;
+    display:flex;flex-direction:column;gap:8px;
+    cursor:pointer;text-align:left;
+    transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+  }
+  .step:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(0,0,0,.12);}
+  .step:focus-visible{outline:3px solid var(--accent);outline-offset:2px;}
+  .step .num{font-size:10px;font-weight:700;letter-spacing:1px;color:var(--muted);}
+  .step .icon{width:36px;height:36px;}
+  .step .s-title{font-size:13.5px;font-weight:700;color:var(--primary);line-height:1.25;}
+  .step .s-blurb{font-size:11.5px;color:var(--muted);line-height:1.45;}
+  .step .s-cta{
+    margin-top:auto;font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;
+    color:var(--stepcolor,var(--accent-deep));display:flex;align-items:center;gap:5px;
+  }
+  .step .s-cta::after{content:"\2197";font-size:12px;}
+  .step.is-result{background:#FFFBEF;}
+  /* connector arrows */
+  .flow .step:not(:last-child)::before{
+    content:"";position:absolute;right:-10px;top:50%;width:10px;height:2px;background:var(--line);z-index:2;
+  }
+  @media(max-width:980px){.flow .step::before{display:none;}}
+
+  .footer{border-top:1px solid var(--line);padding:14px 40px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--muted);margin-top:18px;}
+
+  /* ---- modal ---- */
+  .overlay{
+    position:fixed;inset:0;background:rgba(20,18,16,.55);
+    display:none;align-items:center;justify-content:center;padding:28px;z-index:50;
+    backdrop-filter:blur(2px);
+  }
+  .overlay.open{display:flex;}
+  .modal{
+    background:var(--card);border-radius:12px;max-width:560px;width:100%;
+    max-height:88vh;overflow:auto;box-shadow:0 24px 70px rgba(0,0,0,.35);
+    animation:pop .18s ease;
+  }
+  @keyframes pop{from{transform:translateY(12px) scale(.98);opacity:0;}to{transform:none;opacity:1;}}
+  .modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--card);}
+  .modal-head .mh-label{font-size:10.5px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--olive-deep);}
+  .modal-head .mh-title{font-size:16px;font-weight:700;color:var(--primary);margin-top:2px;}
+  .x-btn{border:none;background:var(--surface);width:32px;height:32px;border-radius:50%;font-size:18px;line-height:1;cursor:pointer;color:var(--ink);flex:0 0 auto;}
+  .x-btn:hover{background:var(--line);}
+  .modal-body{padding:20px;}
+  .modal-note{font-size:12px;color:var(--muted);line-height:1.55;margin-top:14px;padding-top:14px;border-top:1px dashed var(--line);}
+
+  /* ---- generic deep-dive bits ---- */
+  .dd-line{font-size:13.5px;line-height:1.6;color:var(--ink);}
+  .dd-list{list-style:none;margin-top:6px;}
+  .dd-list li{position:relative;padding-left:18px;font-size:13px;line-height:1.55;margin-bottom:7px;}
+  .dd-list li::before{content:"";position:absolute;left:0;top:7px;width:7px;height:7px;border-radius:50%;background:var(--accent);}
+  .code{background:#1E1E24;color:#E8E8EC;border-radius:8px;padding:14px 16px;font-family:'SFMono-Regular',Consolas,Menlo,monospace;font-size:12px;line-height:1.65;white-space:pre-wrap;overflow:auto;}
+  .code .k{color:#FFBF00;}.code .s{color:#9ECBFF;}.code .c{color:#7d8590;}
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:13px;margin-top:4px;}
+  .kv dt{color:var(--muted);}
+  .kv dd{font-weight:600;color:var(--ink);}
+
+  /* data table (cube view) */
+  table.cube{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px;}
+  table.cube th,table.cube td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--line);}
+  table.cube th:first-child,table.cube td:first-child{text-align:left;}
+  table.cube thead th{font-size:10.5px;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);}
+  table.cube tr.flag td{background:var(--danger-soft);color:var(--danger);font-weight:700;}
+  table.cube tr.total td{border-top:2px solid var(--primary);font-weight:700;}
+  td.neg{color:var(--danger);}
+
+  /* bar chart */
+  .chart{display:flex;align-items:flex-end;gap:18px;height:200px;padding:14px 6px 0 6px;border-bottom:2px solid var(--line);}
+  .barpair{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:0;height:100%;}
+  .bars{display:flex;align-items:flex-end;gap:6px;height:100%;width:100%;justify-content:center;}
+  .bar{width:26px;border-radius:4px 4px 0 0;position:relative;}
+  .bar.actual{background:var(--danger);}
+  .bar.budget{background:var(--olive);}
+  .bar .blab{position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:9.5px;font-weight:700;color:var(--muted);white-space:nowrap;}
+  .barpair .qlab{margin-top:8px;font-size:11px;font-weight:700;color:var(--ink);}
+  .legend{display:flex;gap:18px;margin-top:14px;font-size:11.5px;color:var(--muted);}
+  .legend span{display:flex;align-items:center;gap:6px;}
+  .legend i{width:12px;height:12px;border-radius:3px;display:inline-block;}
+
+  /* ===== Teams card recreation ===== */
+  .teams{font-family:'Segoe UI',Arial,sans-serif;border:1px solid #E1E1E1;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08);}
+  .teams-meta{display:flex;align-items:center;gap:10px;padding:6px 4px 10px 2px;font-size:12px;color:#616161;}
+  .teams-app{width:30px;height:30px;border-radius:6px;background:linear-gradient(135deg,#7B83EB,#5059C9);display:flex;align-items:center;justify-content:center;flex:0 0 auto;}
+  .teams-app svg{width:18px;height:18px;}
+  .teams-card-head{background:#EEF1FA;padding:14px 18px;}
+  .teams-card-head h3{font-size:17px;font-weight:700;color:#242424;margin:0;}
+  .teams-card-head .sub{font-size:12px;color:#616161;margin-top:4px;}
+  .teams-card-body{padding:16px 18px 18px 18px;}
+  .teams-card-body .greet{font-size:14px;color:#242424;line-height:1.5;}
+  .teams-card-body .greet b{color:#C0392B;}
+  .teams-banner{background:var(--danger-soft);color:var(--danger);font-weight:700;font-size:14px;padding:12px 14px;border-radius:6px;margin:14px 0;}
+  .teams-kpis{display:flex;gap:14px;margin:8px 0 4px 0;}
+  .teams-kpi{flex:1;}
+  .teams-kpi .lbl{font-size:13px;color:#616161;}
+  .teams-kpi .val{font-size:26px;font-weight:700;line-height:1.15;margin-top:6px;}
+  .teams-kpi .val.red{color:var(--danger);}
+  .teams-kpi .meta{font-size:11.5px;color:#909090;margin-top:4px;line-height:1.35;}
+  .teams-kpi .meta.red{color:var(--danger);font-weight:600;}
+  .teams-sep{height:1px;background:#E8E8E8;margin:14px 0;}
+  .teams-qh{font-size:13px;font-weight:700;color:#242424;margin-bottom:8px;}
+  .qrow{display:grid;grid-template-columns:64px 1fr;gap:8px;font-size:13px;padding:5px 0;color:#333;}
+  .qrow b{color:#242424;}
+  .qrow .qd{color:#555;}
+
+  @media print{body{background:#fff;padding:0;}.slide{box-shadow:none;max-width:none;}}
+</style>
+</head>
+<body>
+  <div class="slide">
+    <div class="topbar">
+      <div class="page-chip">02</div>
+      <div class="wordmark">twoday</div>
+    </div>
+    <div class="hairline"></div>
+
+    <div class="head">
+      <div class="eyebrow" id="eyebrow"></div>
+      <h1 id="headline"></h1>
+      <span class="accent-bar"></span>
+      <p id="subhead"></p>
+    </div>
+
+    <!-- persona this workflow serves -->
+    <div class="persona-strip">
+      <div id="persona-avatar"></div>
+      <div class="ps-meta">
+        <span class="ps-role" id="p-role"></span>
+        <span class="ps-name" id="p-name"></span>
+        <span class="ps-quote" id="p-quote"></span>
+      </div>
+      <div class="ps-tag" id="p-tag"></div>
+    </div>
+
+    <div class="flow-wrap">
+      <div class="flow-label">The workflow, end to end <span class="hint">Click any step to deep-dive</span></div>
+      <div class="flow" id="flow"></div>
+    </div>
+
+    <div class="footer">
+      <span id="footer-left"></span>
+      <span id="footer-right"></span>
+    </div>
+  </div>
+
+  <!-- modal -->
+  <div class="overlay" id="overlay" role="dialog" aria-modal="true">
+    <div class="modal">
+      <div class="modal-head">
+        <div>
+          <div class="mh-label" id="m-label"></div>
+          <div class="mh-title" id="m-title"></div>
+        </div>
+        <button class="x-btn" id="x-btn" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body" id="m-body"></div>
+    </div>
+  </div>
+
+<script>
+/* ============================================================
+   AI WORKFLOW SCENARIO SCAFFOLD — edit ONLY the config below.
+   • persona      : the role this workflow serves (drives the strip up top)
+   • steps[]      : each becomes a clickable card; `popup` chooses a deep-dive.
+   popup.kind options:
+     "schedule"  -> key/value config + cron
+     "cube"      -> data table (rows + flagged row)
+     "reasoning" -> agent prompt/output as code block + bullets
+     "chart"     -> Actual vs Budget bar chart (from data.quarters)
+     "teams"     -> faithful Teams adaptive-card recreation
+     "generic"   -> intro line + bullet list
+   color options : "amber","olive","tan","taupe","danger" (cycles if omitted)
+   ============================================================ */
+const config = {
+  eyebrow: "Demo Session · AI-Powered Workflow",
+  headline: "Anomaly alert & drill-down — costs that flag themselves",
+  subhead: "A scheduled AI agent watches the Cost Center cube in Jedox. When actuals breach the budget threshold it drills into the variance, writes the story in plain language, and pushes it to the FP&A Manager in Teams — before they’ve opened a spreadsheet.",
+  footerLeft: "Prepared by twoday — Confidential",
+  footerRight: "AI workflow scenario · customise per client",
+
+  persona: {
+    role: "FP&A Manager",
+    name: "Mikael Paulin",
+    quote: "I don’t want to hunt for problems — I want the problems to find me.",
+    avatar: "analyst",
+    tag: "Owns budget vs actual<br><b>Receives the alert in Teams</b>"
+  },
+
+  // shared data the popups draw from
+  data: {
+    // `var` is taken straight from the source card (its raw cells carry more
+    // decimals than the rounded actual/budget shown), so totals reconcile exactly.
+    quarters: [
+      {q:"Q1", actual:30.1, budget:25.6, var:-4.4},
+      {q:"Q2", actual:41.7, budget:35.9, var:-5.8},
+      {q:"Q3", actual:33.0, budget:28.2, var:-4.8},
+      {q:"Q4", actual:44.6, budget:38.4, var:-6.1}
+    ],
+    totals: {actual:149.3, budget:128.1, variance:-21.2, pct:16.5},
+    peak: {month:"Dec", actual:16.5, budget:14.2}
+  },
+
+  steps: [
+    {
+      title:"Scheduled trigger",
+      blurb:"Runs every night at 06:00 — no one has to remember to check.",
+      icon:"clock", color:"olive",
+      popup:{ kind:"schedule", label:"Step 1 · Trigger",
+        intro:"The agent is on a timer. It wakes, authenticates to Jedox, and starts the run unattended.",
+        kv:[["Cadence","Nightly"],["Time","06:00 CET"],["Trigger type","Cron schedule"],["Owner","Unattended service account"]],
+        cron:"0 6 * * *   # every day at 06:00" }
+    },
+    {
+      title:"Read the cube",
+      blurb:"Pulls the AI_CostCenter view from the Cost Center cube in Jedox.",
+      icon:"db", color:"olive",
+      popup:{ kind:"cube", label:"Step 2 · Data source",
+        intro:"It reads one clean view — Total Group, all cost centres, FY2024, currency LC. No exports, no copy-paste.",
+        source:"Cube: Cost Center · View: AI_CostCenter · Currency LC" }
+    },
+    {
+      title:"Detect the anomaly",
+      blurb:"Compares actual vs budget against a ±5% tolerance. Every month breaches.",
+      icon:"alert", color:"danger",
+      popup:{ kind:"reasoning", label:"Step 3 · Detection",
+        intro:"The threshold rule is explicit and auditable. Only a real breach wakes the rest of the workflow.",
+        rule:[
+          "Tolerance: actual within ±5% of budget = OK",
+          "FY2024 actual 149.3M vs budget 128.1M → +16.5%",
+          "Breach on the full year AND on all four quarters",
+          "Verdict: OVER BUDGET — escalate"
+        ],
+        code:"<span class='c'># anomaly rule (pseudocode)</span>\n<span class='k'>if</span> abs(actual - budget) / budget &gt; <span class='s'>0.05</span>:\n    flag = <span class='s'>\"OVER_BUDGET\"</span>\n    variance = budget - actual   <span class='c'># -21.2M</span>\n    severity = <span class='s'>\"HIGH\"</span>   <span class='c'># every month breached</span>" }
+    },
+    {
+      title:"Drill into variance",
+      blurb:"Breaks the gap down by quarter and month, finds the worst offender.",
+      icon:"chart", color:"amber",
+      popup:{ kind:"chart", label:"Step 4 · Drill-down",
+        intro:"It decomposes the −21.2M gap to find where the money went. Q2 and Q4 carry it; December is the single peak month." }
+    },
+    {
+      title:"Compose the story",
+      blurb:"Writes a plain-language summary a human can read in ten seconds.",
+      icon:"pen", color:"amber",
+      popup:{ kind:"reasoning", label:"Step 5 · Narrative",
+        intro:"The numbers become a sentence. No jargon, no chart-reading required — the headline does the work.",
+        rule:[
+          "Lead with the verdict and the size of the miss",
+          "Anchor on three KPIs: actual, budget, variance",
+          "Give the quarterly trail so it’s drill-ready",
+          "Name the peak month so attention goes to the right place"
+        ],
+        code:"<span class='c'># generated summary</span>\n<span class='s'>\"Here's the FY2024 cost summary. Costs ran\n over budget every month. OVER BUDGET —\n +16.5% vs plan (−21.2M LC). Peak month\n was December: 16.5M vs 14.2M budget.\"</span>" }
+    },
+    {
+      title:"Deliver to Teams",
+      blurb:"Posts an adaptive card to the FP&A channel and @mentions the owner.",
+      icon:"teams", color:"danger", isResult:true,
+      popup:{ kind:"teams", label:"Step 6 · Result",
+        intro:"This is what actually lands — the finished card in the FP&A Manager’s Teams channel at 09:36." }
+    }
+  ]
+};
+
+/* ================= render engine (no need to edit) ================= */
+const ACCENTS={amber:"#FFBF00",olive:"#898D61",tan:"#C6AA91",taupe:"#A58D77",danger:"#C0392B"};
+const ACCENT_ORDER=["olive","amber","tan","taupe"];
+
+const ICONS={
+  clock:`<circle cx="18" cy="18" r="15" fill="none" stroke="CC" stroke-width="2.4"/><path d="M18 9v9l6 4" fill="none" stroke="CC" stroke-width="2.4" stroke-linecap="round"/>`,
+  db:`<ellipse cx="18" cy="9" rx="12" ry="4.5" fill="none" stroke="CC" stroke-width="2.4"/><path d="M6 9v18c0 2.5 5.4 4.5 12 4.5s12-2 12-4.5V9" fill="none" stroke="CC" stroke-width="2.4"/><path d="M6 18c0 2.5 5.4 4.5 12 4.5s12-2 12-4.5" fill="none" stroke="CC" stroke-width="2.4"/>`,
+  alert:`<path d="M18 5 L33 30 H3 Z" fill="none" stroke="CC" stroke-width="2.4" stroke-linejoin="round"/><path d="M18 15v7" stroke="CC" stroke-width="2.6" stroke-linecap="round"/><circle cx="18" cy="26" r="1.6" fill="CC"/>`,
+  chart:`<path d="M5 31V6" stroke="CC" stroke-width="2.4" stroke-linecap="round"/><path d="M5 31h26" stroke="CC" stroke-width="2.4" stroke-linecap="round"/><rect x="10" y="20" width="4.5" height="9" fill="CC"/><rect x="18" y="14" width="4.5" height="15" fill="CC"/><rect x="26" y="9" width="4.5" height="20" fill="CC"/>`,
+  pen:`<path d="M6 30l2-6L24 8l4 4L12 28Z" fill="none" stroke="CC" stroke-width="2.4" stroke-linejoin="round"/><path d="M22 10l4 4" stroke="CC" stroke-width="2.4"/>`,
+  teams:`<rect x="4" y="9" width="18" height="18" rx="3" fill="none" stroke="CC" stroke-width="2.4"/><path d="M8 15h10M8 20h7" stroke="CC" stroke-width="2.4" stroke-linecap="round"/><circle cx="27" cy="13" r="5" fill="none" stroke="CC" stroke-width="2.4"/>`
+};
+function icon(kind,hex){return `<svg class="icon" viewBox="0 0 36 36">${(ICONS[kind]||ICONS.clock).replace(/CC/g,hex)}</svg>`;}
+
+/* persona avatar (reused from scaffold, analyst face) */
+function avatarSVG(hex){
+  return `<svg class="avatar" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="60" cy="60" r="58" fill="#EFF0E4"/>
+    <circle cx="60" cy="60" r="58" fill="none" stroke="${hex}" stroke-width="4"/>
+    <path d="M22 104a38 38 0 0 1 76 0Z" fill="${hex}"/>
+    <path d="M44 94 L60 88 L76 94 L76 104 L44 104 Z" fill="#FFFFFF"/>
+    <circle cx="60" cy="52" r="22" fill="#E8B98C"/>
+    <path d="M38 54 q2 -26 22 -26 q20 0 22 26 q-4 -10 -10 -12 q-4 8 -12 8 q-8 0 -12 -6 q-6 2 -10 10Z" fill="#5B4636"/>
+    <circle cx="52" cy="52" r="2.4" fill="#1A1A2E"/><circle cx="68" cy="52" r="2.4" fill="#1A1A2E"/>
+    <rect x="46" y="48" width="12" height="9" rx="2" fill="none" stroke="#1A1A2E" stroke-width="1.6"/>
+    <rect x="62" y="48" width="12" height="9" rx="2" fill="none" stroke="#1A1A2E" stroke-width="1.6"/>
+    <line x1="58" y1="51" x2="62" y2="51" stroke="#1A1A2E" stroke-width="1.6"/>
+    <path d="M53 63 q7 4 14 0" fill="none" stroke="#A8744B" stroke-width="2" stroke-linecap="round"/>
+  </svg>`;
+}
+
+/* ---- popup body builders ---- */
+function buildSchedule(p){
+  const kv=p.kv.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join("");
+  return `<p class="dd-line">${p.intro}</p><dl class="kv" style="margin-top:14px">${kv}</dl>
+    <div class="code" style="margin-top:14px"><span class="k">cron</span>  ${p.cron}</div>`;
+}
+function buildCube(p){
+  const d=config.data;
+  const rows=d.quarters.map(q=>{
+    const v=(q.var!=null)?q.var:(q.actual-q.budget);
+    return `<tr><td>${q.q}</td><td>${q.actual.toFixed(1)}M</td><td>${q.budget.toFixed(1)}M</td><td class="neg">−${Math.abs(v).toFixed(1)}M</td></tr>`;
+  }).join("");
+  const t=d.totals;
+  return `<p class="dd-line">${p.intro}</p>
+    <div class="modal-note" style="border:none;padding:0;margin:10px 0 0">${p.source}</div>
+    <table class="cube">
+      <thead><tr><th>Period</th><th>Actual</th><th>Budget</th><th>Variance</th></tr></thead>
+      <tbody>${rows}
+        <tr class="total"><td>FY2024</td><td>${t.actual.toFixed(1)}M</td><td>${t.budget.toFixed(1)}M</td><td class="neg">−${Math.abs(t.variance).toFixed(1)}M</td></tr>
+        <tr class="flag"><td>Peak · ${d.peak.month}</td><td>${d.peak.actual.toFixed(1)}M</td><td>${d.peak.budget.toFixed(1)}M</td><td>−${(d.peak.actual-d.peak.budget).toFixed(1)}M</td></tr>
+      </tbody>
+    </table>
+    <p class="modal-note">The agent reads these cells directly from Jedox — the same view a human would open, but in milliseconds.</p>`;
+}
+function buildReasoning(p){
+  const bl=p.rule.map(r=>`<li>${r}</li>`).join("");
+  return `<p class="dd-line">${p.intro}</p>
+    <ul class="dd-list" style="margin-top:12px">${bl}</ul>
+    <div class="code" style="margin-top:14px">${p.code}</div>`;
+}
+function buildChart(p){
+  const d=config.data;
+  const max=Math.max(...d.quarters.flatMap(q=>[q.actual,q.budget]));
+  const bars=d.quarters.map(q=>{
+    const ah=Math.round(q.actual/max*160), bh=Math.round(q.budget/max*160);
+    return `<div class="barpair"><div class="bars">
+        <div class="bar actual" style="height:${ah}px"><span class="blab">${q.actual.toFixed(1)}</span></div>
+        <div class="bar budget" style="height:${bh}px"><span class="blab">${q.budget.toFixed(1)}</span></div>
+      </div><div class="qlab">${q.q}</div></div>`;
+  }).join("");
+  return `<p class="dd-line">${p.intro}</p>
+    <div class="chart" style="margin-top:16px">${bars}</div>
+    <div class="legend"><span><i style="background:var(--danger)"></i>Actual</span><span><i style="background:var(--olive)"></i>Budget</span><span style="margin-left:auto;color:var(--danger);font-weight:700">Total miss −${Math.abs(d.totals.variance)}M (+${d.totals.pct}%)</span></div>
+    <p class="modal-note">Q2 and Q4 carry most of the overspend; <b>${d.peak.month}</b> is the single peak month at ${d.peak.actual}M vs ${d.peak.budget}M budget — that's where the agent points attention.</p>`;
+}
+function buildTeams(p){
+  const d=config.data, t=d.totals;
+  const qrows=d.quarters.map(q=>{const v=(q.var!=null)?q.var:(q.actual-q.budget);return `<div class="qrow"><b>${q.q}</b><span class="qd">Actual ${q.actual.toFixed(1)}M · Budget ${q.budget.toFixed(1)}M · Var −${Math.abs(v).toFixed(1)}M</span></div>`;}).join("");
+  return `<p class="dd-line" style="margin-bottom:16px">${p.intro}</p>
+    <div class="teams">
+      <div class="teams-card-head">
+        <h3>Cost Center — FY2024 Actual vs Budget</h3>
+        <div class="sub">Cube: Cost Center · View: AI_CostCenter · Currency LC · generated 25 Jun 2026</div>
+      </div>
+      <div class="teams-card-body">
+        <div class="greet"><b>${config.persona.name}</b> — here's the FY2024 cost summary. Costs ran over budget every month.</div>
+        <div class="teams-banner">▼ OVER BUDGET — +${t.pct}% vs plan (−${Math.abs(t.variance)}M LC)</div>
+        <div class="teams-kpis">
+          <div class="teams-kpi"><div class="lbl">Actual cost</div><div class="val red">${t.actual}M</div><div class="meta">Total Group · All Cost Centers</div></div>
+          <div class="teams-kpi"><div class="lbl">Budget</div><div class="val">${t.budget}M</div><div class="meta">FY2024 plan</div></div>
+          <div class="teams-kpi"><div class="lbl">Variance</div><div class="val red">−${Math.abs(t.variance)}M</div><div class="meta red">▼ over budget</div></div>
+        </div>
+        <div class="teams-sep"></div>
+        <div class="teams-qh">Quarterly breakdown (LC)</div>
+        ${qrows}
+        <div class="qrow"><b>Peak</b><span class="qd">${d.peak.month} — Actual ${d.peak.actual}M vs Budget ${d.peak.budget}M</span></div>
+      </div>
+    </div>
+    <div class="teams-meta">
+      <div class="teams-app"><svg viewBox="0 0 24 24" fill="#fff"><circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M3 20v-2a5 5 0 0 1 10 0v2zM13 20v-2a5 5 0 0 1 8-4" fill="none" stroke="#fff" stroke-width="2"/></svg></div>
+      <span><b style="color:#242424">Workflows</b> · posted to FP&A channel · 09:36</span>
+    </div>`;
+}
+const BUILDERS={schedule:buildSchedule,cube:buildCube,reasoning:buildReasoning,chart:buildChart,teams:buildTeams,
+  generic:(p)=>`<p class="dd-line">${p.intro}</p><ul class="dd-list" style="margin-top:12px">${(p.rule||[]).map(r=>`<li>${r}</li>`).join("")}</ul>`};
+
+/* ---- main render ---- */
+function render(){
+  document.getElementById("eyebrow").textContent=config.eyebrow;
+  document.getElementById("headline").textContent=config.headline;
+  document.getElementById("subhead").textContent=config.subhead;
+  document.getElementById("footer-left").textContent=config.footerLeft;
+  document.getElementById("footer-right").textContent=config.footerRight;
+
+  const pe=config.persona;
+  document.getElementById("persona-avatar").innerHTML=avatarSVG(ACCENTS.olive);
+  document.getElementById("p-role").textContent=pe.role;
+  document.getElementById("p-name").textContent=pe.name;
+  document.getElementById("p-quote").textContent="“"+pe.quote+"”";
+  document.getElementById("p-tag").innerHTML=pe.tag;
+
+  const flow=document.getElementById("flow");
+  flow.innerHTML=config.steps.map((s,i)=>{
+    const hex=ACCENTS[s.color]||ACCENTS[ACCENT_ORDER[i%ACCENT_ORDER.length]];
+    return `<button class="step ${s.isResult?'is-result':''}" style="--stepcolor:${hex}" data-i="${i}">
+      <span class="num">STEP ${i+1}</span>
+      ${icon(s.icon,hex)}
+      <span class="s-title">${s.title}</span>
+      <span class="s-blurb">${s.blurb}</span>
+      <span class="s-cta">Deep-dive</span>
+    </button>`;
+  }).join("");
+  flow.querySelectorAll(".step").forEach(b=>b.addEventListener("click",()=>openModal(+b.dataset.i)));
+}
+
+/* ---- modal control ---- */
+const overlay=document.getElementById("overlay");
+function openModal(i){
+  const s=config.steps[i], p=s.popup;
+  document.getElementById("m-label").textContent=p.label||("Step "+(i+1));
+  document.getElementById("m-title").textContent=s.title;
+  document.getElementById("m-body").innerHTML=(BUILDERS[p.kind]||BUILDERS.generic)(p);
+  overlay.classList.add("open");
+}
+function closeModal(){overlay.classList.remove

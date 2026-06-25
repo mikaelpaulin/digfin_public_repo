@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nordic Retail Group — FY2024 P&amp;L · twoday</title>
+<style>
+  :root{
+    --primary:#000000;
+    --accent:#FFBF00;
+    --accent-deep:#CC9900;
+    --olive:#898D61;
+    --olive-deep:#6E7049;
+    --tan:#C6AA91;
+    --taupe:#A58D77;
+    --muted:#838383;
+    --line:#E6E2E0;
+    --surface:#F0ECEB;
+    --card:#FFFFFF;
+    --ink:#1A1A1A;
+    --pos:#3E7D58;
+    --neg:#C0392B;
+    --font:Arial,'Helvetica Neue',Helvetica,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
+  body{font-family:var(--font);color:var(--ink);background:var(--surface);-webkit-font-smoothing:antialiased;display:flex;justify-content:center;padding:32px 24px;}
+  .slide{width:100%;max-width:1180px;background:var(--card);border-radius:4px;box-shadow:0 8px 40px rgba(0,0,0,.10);overflow:hidden;display:flex;flex-direction:column;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:18px 40px 0 40px;}
+  .page-chip{background:var(--accent);color:#000;font-weight:700;font-size:13px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:3px;}
+  .wordmark{font-weight:700;font-size:15px;letter-spacing:.2px;}
+  .hairline{height:2px;background:var(--primary);margin:14px 40px 0 40px;}
+  .head{padding:30px 40px 4px 40px;}
+  .eyebrow{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--olive-deep);margin-bottom:10px;}
+  .head h1{font-size:32px;font-weight:700;line-height:1.12;color:var(--primary);}
+  .head .accent-bar{display:inline-block;width:46px;height:5px;background:var(--accent);margin-top:14px;border-radius:2px;}
+  .head p{margin-top:14px;font-size:14px;color:var(--muted);max-width:820px;}
+  /* KPI row */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;padding:24px 40px 8px 40px;}
+  @media(max-width:820px){.kpis{grid-template-columns:repeat(2,1fr);}}
+  .kpi{border:1px solid var(--line);border-top:4px solid var(--kc,var(--accent));border-radius:8px;padding:16px 18px;}
+  .kpi .lbl{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);}
+  .kpi .val{font-size:27px;font-weight:700;color:var(--primary);margin-top:8px;line-height:1.1;}
+  .kpi .yoy{font-size:12px;font-weight:700;margin-top:6px;}
+  .kpi .yoy.up{color:var(--pos);}
+  .kpi .yoy.down{color:var(--neg);}
+  .kpi .sub{font-size:11px;color:var(--muted);margin-top:2px;}
+  /* P&L table */
+  .section{padding:18px 40px 8px 40px;}
+  .section h2{font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--primary);display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+  .section h2::before{content:"";width:14px;height:14px;background:var(--accent);border-radius:2px;}
+  table.pnl{width:100%;border-collapse:collapse;font-size:13.5px;}
+  table.pnl th,table.pnl td{padding:9px 12px;text-align:right;border-bottom:1px solid var(--line);}
+  table.pnl th:first-child,table.pnl td:first-child{text-align:left;}
+  table.pnl thead th{font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);border-bottom:2px solid var(--primary);}
+  table.pnl td.line{color:var(--ink);}
+  table.pnl tr.sub td:first-child{padding-left:28px;color:var(--muted);font-weight:400;}
+  table.pnl tr.total td{font-weight:700;border-top:1px solid var(--line);background:#FCFBFA;}
+  table.pnl tr.grand td{font-weight:700;border-top:2px solid var(--primary);border-bottom:2px solid var(--primary);background:#FFFBEF;font-size:14.5px;}
+  td.pos{color:var(--pos);font-weight:600;}
+  td.neg{color:var(--neg);font-weight:600;}
+  .num{font-variant-numeric:tabular-nums;}
+  .twocol{display:grid;grid-template-columns:1.3fr 1fr;gap:28px;align-items:start;}
+  @media(max-width:900px){.twocol{grid-template-columns:1fr;}}
+  /* bar chart */
+  .chart-card{border:1px solid var(--line);border-radius:8px;padding:18px;}
+  .chart{display:flex;align-items:flex-end;gap:14px;height:190px;padding:18px 4px 0 4px;border-bottom:2px solid var(--line);}
+  .barpair{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;}
+  .bars{display:flex;align-items:flex-end;gap:5px;height:100%;width:100%;justify-content:center;}
+  .bar{width:22px;border-radius:4px 4px 0 0;position:relative;}
+  .bar.act{background:var(--olive);}
+  .bar.bud{background:var(--tan);}
+  .bar .blab{position:absolute;top:-15px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:700;color:var(--muted);}
+  .qlab{margin-top:8px;font-size:11px;font-weight:700;}
+  .legend{display:flex;gap:16px;margin-top:12px;font-size:11.5px;color:var(--muted);}
+  .legend span{display:flex;align-items:center;gap:6px;}
+  .legend i{width:12px;height:12px;border-radius:3px;}
+  .callout{background:var(--surface);border-left:4px solid var(--accent);border-radius:6px;padding:14px 16px;margin-top:16px;}
+  .callout .ct{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--olive-deep);margin-bottom:6px;}
+  .callout p{font-size:13px;line-height:1.55;color:var(--ink);}
+  .footer{border-top:1px solid var(--line);padding:16px 40px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--muted);margin-top:18px;flex-wrap:wrap;gap:8px;}
+  .badge{display:inline-block;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:3px 10px;font-size:10.5px;font-weight:700;letter-spacing:.5px;color:var(--olive-deep);}
+  @media print{body{background:#fff;padding:0;}.slide{box-shadow:none;max-width:none;}}
+</style>
+</head>
+<body>
+  <div class="slide">
+    <div class="topbar">
+      <div class="page-chip">P&amp;L</div>
+      <div class="wordmark">twoday</div>
+    </div>
+    <div class="hairline"></div>
+    <div class="head">
+      <div class="eyebrow">Nordic Retail Group · Management Accounts</div>
+      <h1>FY2024 Profit &amp; Loss — Group Consolidated</h1>
+      <span class="accent-bar"></span>
+      <p>Audited full-year result for the 12 months ended 31 December 2024. Figures in DKK millions, presented Actual vs Budget vs Prior Year. <span class="badge">Fictitious demo data</span></p>
+    </div>
+    <!-- KPI summary -->
+    <div class="kpis">
+      <div class="kpi" style="--kc:var(--olive)">
+        <div class="lbl">Revenue</div>
+        <div class="val">4,182.6</div>
+        <div class="yoy up">▲ +8.4% YoY</div>
+        <div class="sub">vs budget +2.1%</div>
+      </div>
+      <div class="kpi" style="--kc:var(--accent)">
+        <div class="lbl">Gross profit</div>
+        <div class="val">1,706.9</div>
+        <div class="yoy up">▲ +6.9% YoY</div>
+        <div class="sub">margin 40.8%</div>
+      </div>
+      <div class="kpi" style="--kc:var(--tan)">
+        <div class="lbl">EBITDA</div>
+        <div class="val">512.4</div>
+        <div class="yoy up">▲ +4.2% YoY</div>
+        <div class="sub">margin 12.3%</div>
+      </div>
+      <div class="kpi" style="--kc:var(--taupe)">
+        <div class="lbl">Net profit</div>
+        <div class="val">238.7</div>
+        <div class="yoy down">▼ −1.8% YoY</div>
+        <div class="sub">margin 5.7%</div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="twocol">
+        <!-- P&L statement -->
+        <div>
+          <h2>Income statement</h2>
+          <table class="pnl">
+            <thead>
+              <tr><th>DKK m</th><th>Actual</th><th>Budget</th><th>Var</th><th>Prior yr</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="line">Revenue</td><td class="num">4,182.6</td><td class="num">4,096.0</td><td class="num pos">+86.6</td><td class="num">3,857.9</td></tr>
+              <tr class="sub"><td>Cost of goods sold</td><td class="num">(2,475.7)</td><td class="num">(2,432.0)</td><td class="num neg">−43.7</td><td class="num">(2,261.0)</td></tr>
+              <tr class="total"><td class="line">Gross profit</td><td class="num">1,706.9</td><td class="num">1,664.0</td><td class="num pos">+42.9</td><td class="num">1,596.9</td></tr>
+              <tr class="sub"><td>Staff costs</td><td class="num">(742.1)</td><td class="num">(720.0)</td><td class="num neg">−22.1</td><td class="num">(688.4)</td></tr>
+              <tr class="sub"><td>Property &amp; occupancy</td><td class="num">(268.9)</td><td class="num">(265.0)</td><td class="num neg">−3.9</td><td class="num">(254.2)</td></tr>
+              <tr class="sub"><td>Marketing</td><td class="num">(112.4)</td><td class="num">(124.0)</td><td class="num pos">+11.6</td><td class="num">(101.7)</td></tr>
+              <tr class="sub"><td>Other operating</td><td class="num">(71.1)</td><td class="num">(69.0)</td><td class="num neg">−2.1</td><td class="num">(60.8)</td></tr>
+              <tr class="total"><td class="line">EBITDA</td><td class="num">512.4</td><td class="num">486.0</td><td class="num pos">+26.4</td><td class="num">491.8</td></tr>
+              <tr class="sub"><td>Depreciation &amp; amortisation</td><td class="num">(146.2)</td><td class="num">(140.0)</td><td class="num neg">−6.2</td><td class="num">(132.5)</td></tr>
+              <tr class="total"><td class="line">EBIT</td><td class="num">366.2</td><td class="num">346.0</td><td class="num pos">+20.2</td><td class="num">359.3</td></tr>
+              <tr class="sub"><td>Net finance costs</td><td class="num">(60.8)</td><td class="num">(48.0)</td><td class="num neg">−12.8</td><td class="num">(41.2)</td></tr>
+              <tr class="total"><td class="line">Profit before tax</td><td class="num">305.4</td><td class="num">298.0</td><td class="num pos">+7.4</td><td class="num">318.1</td></tr>
+              <tr class="sub"><td>Income tax (22%)</td><td class="num">(66.7)</td><td class="num">(65.6)</td><td class="num neg">−1.1</td><td class="num">(75.0)</td></tr>
+              <tr class="grand"><td class="line">Net profit</td><td class="num">238.7</td><td class="num">232.4</td><td class="num pos">+6.3</td><td class="num">243.1</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- chart + commentary -->
+        <div>
+          <h2>Quarterly revenue</h2>
+          <div class="chart-card">
+            <div class="chart">
+              <div class="barpair"><div class="bars"><div class="bar act" style="height:118px"><span class="blab">932</span></div><div class="bar bud" style="height:122px"><span class="blab">960</span></div></div><div class="qlab">Q1</div></div>
+              <div class="barpair"><div class="bars"><div class="bar act" style="height:128px"><span class="blab">1,011</span></div><div class="bar bud" style="height:124px"><span class="blab">980</span></div></div><div class="qlab">Q2</div></div>
+              <div class="barpair"><div class="bars"><div class="bar act" style="height:126px"><span class="blab">996</span></div><div class="bar bud" style="height:127px"><span class="blab">1,004</span></div></div><div class="qlab">Q3</div></div>
+              <div class="barpair"><div class="bars"><div class="bar act" style="height:160px"><span class="blab">1,244</span></div><div class="bar bud" style="height:148px"><span class="blab">1,152</span></div></div><div class="qlab">Q4</div></div>
+            </div>
+            <div class="legend"><span><i style="background:var(--olive)"></i>Actual</span><span><i style="background:var(--tan)"></i>Budget</span></div>
+          </div>
+          <div class="callout">
+            <div class="ct">Management commentary</div>
+            <p>Revenue beat plan by 2.1%, driven by a strong Q4 peak (+8% vs budget) on the back of seasonal promotions. Gross margin held at 40.8%. Net profit dipped 1.8% YoY as finance costs rose 12.8M above budget following the refinancing in Q2 — the one line management is watching into FY2025.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      <span>Prepared by twoday for Nordic Retail Group — Confidential · Fictitious demo</span>
+      <span>Source: Jedox · Cube: Group_PnL · Generated 25 Jun 2026</span>
+    </div>
+  </div>
+</body>
+</html>

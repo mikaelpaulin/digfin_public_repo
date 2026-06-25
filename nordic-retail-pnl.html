@@ -23,8 +23,8 @@
     --font:Arial,'Helvetica Neue',Helvetica,sans-serif;
   }
   *{box-sizing:border-box;margin:0;padding:0;}
-  html,body{height:100%;}
-  body{font-family:var(--font);color:var(--ink);background:var(--surface);-webkit-font-smoothing:antialiased;display:flex;justify-content:center;padding:32px 24px;}
+  html{height:100%;}
+  body{min-height:100%;font-family:var(--font);color:var(--ink);background:var(--surface);-webkit-font-smoothing:antialiased;display:flex;justify-content:center;padding:32px 24px;overflow-x:hidden;}
   .slide{width:100%;max-width:1180px;background:var(--card);border-radius:4px;box-shadow:0 8px 40px rgba(0,0,0,.10);overflow:hidden;display:flex;flex-direction:column;}
   .topbar{display:flex;align-items:center;justify-content:space-between;padding:18px 40px 0 40px;}
   .page-chip{background:var(--accent);color:#000;font-weight:700;font-size:13px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:3px;}
@@ -61,7 +61,7 @@
   td.neg{color:var(--neg);font-weight:600;}
   .num{font-variant-numeric:tabular-nums;}
   .twocol{display:grid;grid-template-columns:1.3fr 1fr;gap:28px;align-items:start;}
-  @media(max-width:900px){.twocol{grid-template-columns:1fr;}}
+  @media(max-width:1024px){.twocol{grid-template-columns:1fr;}}
   /* bar chart */
   .chart-card{border:1px solid var(--line);border-radius:8px;padding:18px;}
   .chart{display:flex;align-items:flex-end;gap:14px;height:190px;padding:18px 4px 0 4px;border-bottom:2px solid var(--line);}
@@ -80,6 +80,18 @@
   .callout p{font-size:13px;line-height:1.55;color:var(--ink);}
   .footer{border-top:1px solid var(--line);padding:16px 40px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--muted);margin-top:18px;flex-wrap:wrap;gap:8px;}
   .badge{display:inline-block;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:3px 10px;font-size:10.5px;font-weight:700;letter-spacing:.5px;color:var(--olive-deep);}
+  @media(max-width:1024px){
+    .topbar,.hairline,.head,.kpis,.section,.footer{padding-left:24px;padding-right:24px;}
+    .hairline{margin-left:24px;margin-right:24px;}
+  }
+  @media(max-width:560px){
+    body{padding:16px 12px;}
+    .topbar,.hairline,.head,.kpis,.section,.footer{padding-left:16px;padding-right:16px;}
+    .hairline{margin-left:16px;margin-right:16px;}
+    .head h1{font-size:25px;}
+    table.pnl{font-size:12px;}
+    table.pnl th,table.pnl td{padding:7px 6px;}
+  }
   @media print{body{background:#fff;padding:0;}.slide{box-shadow:none;max-width:none;}}
 </style>
 </head>
@@ -164,15 +176,4 @@
           </div>
           <div class="callout">
             <div class="ct">Management commentary</div>
-            <p>Revenue beat plan by 2.1%, driven by a strong Q4 peak (+8% vs budget) on the back of seasonal promotions. Gross margin held at 40.8%. Net profit dipped 1.8% YoY as finance costs rose 12.8M above budget following the refinancing in Q2 — the one line management is watching into FY2025.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="footer">
-      <span>Prepared by twoday for Nordic Retail Group — Confidential · Fictitious demo</span>
-      <span>Source: Jedox · Cube: Group_PnL · Generated 25 Jun 2026</span>
-    </div>
-  </div>
-</body>
-</html>
+            <p>Revenue beat plan by 2.1%, driven by a strong Q4 peak (+8% vs budget) 

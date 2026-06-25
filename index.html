@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DigFin Demo — Q2 Summary</title>
+  <style>
+    :root { --bg:#0f1117; --card:#1a1f2e; --accent:#4f8cff; --text:#e6e9f0; --muted:#8a92a6; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:-apple-system,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem; }
+    .deck { max-width:820px; width:100%; }
+    .eyebrow { color:var(--accent); font-weight:600; letter-spacing:.08em; text-transform:uppercase; font-size:.8rem; }
+    h1 { font-size:2.4rem; margin:.4rem 0 1.5rem; }
+    .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-bottom:1.5rem; }
+    .card { background:var(--card); border:1px solid #262c3d; border-radius:14px; padding:1.4rem; }
+    .kpi { font-size:2rem; font-weight:700; }
+    .kpi.up { color:#3ddc84; }
+    .label { color:var(--muted); font-size:.85rem; margin-top:.3rem; }
+    .note { background:var(--card); border-left:3px solid var(--accent); border-radius:8px; padding:1rem 1.2rem; color:var(--muted); }
+    footer { margin-top:1.5rem; color:var(--muted); font-size:.8rem; }
+  </style>
+</head>
+<body>
+  <div class="deck">
+    <div class="eyebrow">DigFin · Demo Narrative</div>
+    <h1>Q2 Revenue Summary</h1>
+    <div class="grid">
+      <div class="card"><div class="kpi up">€4.2M</div><div class="label">Revenue</div></div>
+      <div class="card"><div class="kpi up">+12%</div><div class="label">vs Plan</div></div>
+      <div class="card"><div class="kpi">38%</div><div class="label">Gross Margin</div></div>
+    </div>
+    <div class="note">Sample placeholder data. In the live pipeline these KPIs are pulled from a Jedox view, summarized here, and the link to this page is delivered via a Teams Adaptive Card.</div>
+    <footer>Generated as a test of the Jedox → HTML → Teams demo chain.</footer>
+  </div>
+</body>
+</html>

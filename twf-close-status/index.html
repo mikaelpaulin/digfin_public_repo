@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Group Close Status Report — 2026-05 YTD | twoday</title>
+<style>
+  :root{
+    --primary:#000000; --ink:#1A1A1A; --muted:#838383;
+    --accent:#FFBF00; --accent-deep:#CC9900;
+    --secondary:#898D61; --secondary-d:#6E7049;
+    --danger:#D9534F; --line:#E6E2E0; --surface:#F0ECEB; --card:#FFFFFF;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:#fff;color:var(--ink);
+    font-family:Arial,'Helvetica Neue',Helvetica,sans-serif;line-height:1.55;
+    font-size:15px;-webkit-font-smoothing:antialiased}
+  .page{max-width:980px;margin:0 auto;padding:0 40px 80px}
+
+  /* furniture */
+  .topbar{display:flex;align-items:center;justify-content:space-between;
+    padding:18px 0 14px;border-bottom:2px solid var(--primary);margin-bottom:0}
+  .chip{background:var(--accent);color:#000;font-weight:700;font-size:12px;
+    padding:5px 10px;border-radius:3px;letter-spacing:.5px}
+  .wordmark{font-weight:700;font-size:19px;letter-spacing:-.5px;color:var(--primary)}
+  .wordmark span{color:var(--accent-deep)}
+
+  /* title block */
+  .hero{padding:40px 0 26px;border-bottom:1px solid var(--line);margin-bottom:34px}
+  .kicker{color:var(--secondary-d);font-weight:700;font-size:12.5px;
+    text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px}
+  h1{font-size:34px;line-height:1.12;margin:0 0 14px;font-weight:700;letter-spacing:-.6px}
+  .meta{color:var(--muted);font-size:13.5px}
+  .meta b{color:var(--ink);font-weight:700}
+  .accentbar{height:5px;width:64px;background:var(--accent);margin:0 0 22px;border-radius:2px}
+
+  h2{font-size:21px;margin:46px 0 6px;font-weight:700;letter-spacing:-.3px;
+    padding-top:8px}
+  h2 .num{color:var(--accent-deep);font-size:15px;margin-right:10px;font-weight:700}
+  .lead{color:var(--muted);font-size:14px;margin:0 0 20px}
+  h3{font-size:15.5px;margin:24px 0 6px;font-weight:700}
+  p{margin:0 0 14px}
+  .small{font-size:13px;color:var(--muted)}
+  strong{font-weight:700}
+  a{color:var(--accent-deep)}
+
+  /* alert */
+  .alert{background:#fbf1f0;border-left:4px solid var(--danger);
+    padding:16px 20px;border-radius:0 6px 6px 0;margin:24px 0}
+  .alert .t{color:var(--danger);font-weight:700;margin-bottom:4px;font-size:14.5px}
+
+  /* kpi grid */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+    background:var(--line);border:1px solid var(--line);border-radius:8px;
+    overflow:hidden;margin:20px 0 8px}
+  .kpi{background:#fff;padding:20px 18px}
+  .kpi .v{font-size:32px;font-weight:700;line-height:1;letter-spacing:-1px}
+  .kpi .l{color:var(--muted);font-size:12px;margin-top:8px;line-height:1.35}
+  .kpi.amber .v{color:var(--accent-deep)} .kpi.red .v{color:var(--danger)}
+  .kpi.olive .v{color:var(--secondary-d)}
+
+  /* tables */
+  table{width:100%;border-collapse:collapse;margin:18px 0;font-size:13.5px}
+  th{text-align:left;background:var(--primary);color:#fff;padding:10px 12px;
+    font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.4px}
+  th.r,td.r{text-align:right}
+  td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  tr:nth-child(even) td{background:#faf9f8}
+  .tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;
+    border-radius:20px;white-space:nowrap}
+  .tag.open{background:#fbe3e2;color:#b0413d}
+  .tag.done{background:#eef0e3;color:var(--secondary-d)}
+  .tag.idle{background:#eee;color:#666}
+  .mono{font-family:'SF Mono',Consolas,monospace;font-size:12.5px;color:var(--ink)}
+
+  /* bar viz */
+  .barrow{display:flex;align-items:center;gap:12px;margin:7px 0;font-size:13px}
+  .barrow .nm{width:90px;color:var(--ink);font-weight:600}
+  .barrow .track{flex:1;height:18px;background:var(--surface);border-radius:3px;overflow:hidden}
+  .barrow .track i{display:block;height:100%;background:var(--danger);opacity:.85}
+  .barrow.done .track i{background:var(--secondary)}
+  .barrow .n{width:34px;text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+
+  /* owner card */
+  .ocard{border:1px solid var(--line);border-radius:8px;padding:16px 18px;margin:12px 0;
+    background:#fff}
+  .ocard.crit{border-left:4px solid var(--danger)}
+  .ocard.part{border-left:4px solid var(--accent)}
+  .ocard .oh{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;
+    margin-bottom:8px}
+  .ocard .on{font-weight:700;font-size:16px}
+  .ocard .os{color:var(--muted);font-size:12.5px}
+  .progress{height:8px;background:var(--surface);border-radius:4px;overflow:hidden;
+    display:flex;margin:10px 0}
+  .progress i{display:block;height:100%}
+  ul.steps{margin:8px 0 0;padding-left:18px;font-size:13px;color:var(--ink)}
+  ul.steps li{margin:2px 0}
+
+  /* action list */
+  .action{display:flex;gap:16px;padding:16px 0;border-bottom:1px solid var(--line)}
+  .action:last-child{border-bottom:none}
+  .action .n{width:30px;height:30px;border-radius:6px;background:var(--accent);
+    color:#000;display:flex;align-items:center;justify-content:center;font-weight:700;
+    flex-shrink:0;font-size:14px}
+  .action .ab{font-weight:700;margin-bottom:2px}
+
+  .note{background:var(--surface);border-radius:8px;padding:16px 20px;margin:22px 0;
+    font-size:13.5px}
+  .note .nt{font-weight:700;margin-bottom:5px}
+
+  footer{margin-top:56px;padding-top:22px;border-top:2px solid var(--primary);
+    display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px}
+  footer .c{font-size:13px}
+  footer .c b{display:block;font-size:14px}
+  footer .meta2{color:var(--muted);font-size:11.5px;text-align:right}
+
+  @media(max-width:720px){
+    .page{padding:0 20px 60px}.kpis{grid-template-columns:repeat(2,1fr)}
+    h1{font-size:26px}.barrow .nm{width:72px}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="topbar">
+    <span class="chip">01</span>
+    <span class="wordmark">two<span>day</span></span>
+  </div>
+
+  <div class="hero">
+    <div class="kicker">EPM · Consolidation Workflow · Status Report</div>
+    <h1>Group Close — Workflow Status &amp; Outstanding Tasks</h1>
+    <div class="meta">
+      <b>MP_WorkflowDemo</b> · cube <b>TWF_Main</b> · Version <b>Actual</b> ·
+      Period <b>2026-05 YTD</b> &nbsp;|&nbsp; Generated <b>26 June 2026</b>
+    </div>
+  </div>
+
+  <!-- EXEC SUMMARY -->
+  <div class="accentbar"></div>
+  <h2><span class="num">01</span>Executive summary</h2>
+  <p class="lead">What the consolidation administrator needs to know in thirty seconds.</p>
+
+  <p>The May close is <strong>materially behind schedule</strong>. Across the group,
+  <strong>143 of 542 active workflow tasks remain open (26%)</strong>, and every task
+  carrying a deadline was due <strong>14 June 2026</strong> — placing the entire close
+  <strong>twelve days overdue</strong> as of this report. The outstanding work is not
+  evenly spread: it concentrates in a handful of entities and a small number of
+  accountable owners who have not yet completed their consolidation sign-offs.</p>
+
+  <p>Two distinct problems sit underneath the single headline number. The first is a
+  <strong>volume</strong> problem in the Month-end closing phase, where the bulk of the
+  143 open tasks live. The second — and the more actionable for an administrator chasing
+  completion — is an <strong>accountability</strong> problem in the Group Consolidation
+  phase: <strong>27 owner sign-off steps are still open across five teams</strong>, and
+  several of those teams have not started at all. A third, quieter risk is that
+  <strong>18 overdue Month-end steps carry a deadline but no assigned owner</strong>,
+  so no one is currently accountable for clearing them.</p>
+
+  <div class="kpis">
+    <div class="kpi red"><div class="v">143</div><div class="l">tasks open<br>of 542 active</div></div>
+    <div class="kpi amber"><div class="v">26%</div><div class="l">of active tasks<br>not completed</div></div>
+    <div class="kpi red"><div class="v">12d</div><div class="l">overdue<br>past 14-Jun deadline</div></div>
+    <div class="kpi olive"><div class="v">4</div><div class="l">entities<br>fully complete</div></div>
+  </div>
+  <p class="small">Completion = 399 of 542 tasks done. Four entities (LSPG2600, LSPG7200,
+  LSPG7600, SPG7500) have cleared every task; the remaining open work sits with twelve entities.</p>
+
+  <!-- OVERDUE -->
+  <h2><span class="num">02</span>Deadlines &amp; the overdue position</h2>
+  <p class="lead">Every dated step shares one deadline — and it has passed.</p>
+
+  <div class="alert">
+    <div class="t">⚠ The close is 12 days overdue</div>
+    All workflow deadlines were set to <strong>14 June 2026</strong>. As of 26 June, no
+    dated step can still be delivered on time. The 18 Month-end steps that carry this
+    deadline — Import From ERP, Upload File, Local Accounts Values (Input), Local Account
+    Mappings, Group GAAP Corrected Breakdown, IC Specification, Revenue Specifications,
+    Update Mapped Values, Input FTE, the four Capex inputs and Fixed Assets Specification —
+    are also <strong>Unassigned</strong>, meaning no owner is presently accountable for them.
+  </div>
+
+  <p>Because the deadlines are uniform rather than staggered by phase, the schedule offers
+  no natural prioritisation signal — everything is equally late. Prioritisation therefore
+  has to come from <strong>ownership and volume</strong>, which the next two sections
+  provide. The immediate deadline-driven action is to <strong>assign the 18 unowned
+  Month-end steps</strong> so that overdue work has a named owner before it can be chased.</p>
+
+  <!-- OWNER ACCOUNTABILITY -->
+  <h2><span class="num">03</span>Owner accountability — who still owes sign-offs</h2>
+  <p class="lead">Group Consolidation sign-off steps, grouped by the owning team. This is the
+  core "not yet done" view.</p>
+
+  <p>In the Group Consolidation phase each scope is assigned to an owning team, and a step
+  is complete when its <strong>Status reads "Done"</strong>. Five owners carry open steps;
+  three owners (SPG Admin, LSPG2600, LSPG7600) have cleared everything assigned to them. The
+  table below ranks owners by open count; detailed breakdowns follow.</p>
+
+  <table>
+    <thead><tr><th>Owner (team)</th><th class="r">Open</th><th class="r">Done</th>
+      <th>Scopes owned</th><th>Last actor</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td><strong>LSPG2700</strong></td><td class="r">9</td><td class="r">0</td>
+        <td class="mono">LSPG2700, LSPG2750, LSPG3500</td><td class="small">— not started</td>
+        <td><span class="tag open">9 open</span></td></tr>
+      <tr><td><strong>LSPG1100</strong></td><td class="r">7</td><td class="r">2</td>
+        <td class="mono">LSPG1100, LSPG2100, LSPG2400</td><td class="mono">ln@sp-medical.dk</td>
+        <td><span class="tag open">7 open</span></td></tr>
+      <tr><td><strong>LSPG4700</strong></td><td class="r">5</td><td class="r">1</td>
+        <td class="mono">LSPG4700, LSPG6100</td><td class="mono">maso@tinby.dk</td>
+        <td><span class="tag open">5 open</span></td></tr>
+      <tr><td><strong>LSPG5500</strong></td><td class="r">3</td><td class="r">0</td>
+        <td class="mono">LSPG5500</td><td class="small">— not started</td>
+        <td><span class="tag open">3 open</span></td></tr>
+      <tr><td><strong>LSPG5800</strong></td><td class="r">3</td><td class="r">0</td>
+        <td class="mono">LSPG5800</td><td class="small">— not started</td>
+        <td><span class="tag open">3 open</span></td></tr>
+      <tr><td>SPG Admin</td><td class="r">0</td><td class="r">5</td>
+        <td class="mono">~ (group prep)</td><td class="mono">avh@ / joba@sp-group.dk</td>
+        <td><span class="tag done">complete</span></td></tr>
+      <tr><td>LSPG2600</td><td class="r">0</td><td class="r">3</td>
+        <td class="mono">LSPG2600</td><td class="mono">Lotte.Hansen@medicopack.com</td>
+        <td><span class="tag done">complete</span></td></tr>
+      <tr><td>LSPG7600</td><td class="r">0</td><td class="r">3</td>
+        <td class="mono">LSPG7600</td><td class="mono">sino@ide-pro.dk</td>
+        <td><span class="tag done">complete</span></td></tr>
+    </tbody>
+  </table>
+
+  <h3>LSPG2700 — highest priority (9 open, nothing started)</h3>
+  <div class="ocard crit">
+    <div class="oh"><div><div class="on">LSPG2700</div>
+      <div class="os">owns LSPG2700, LSPG2750, LSPG3500 · no last actor recorded</div></div>
+      <span class="tag open">9 open</span></div>
+    <div class="progress"><i style="width:100%;background:var(--danger)"></i></div>
+    <p class="small" style="margin:6px 0 0">Not a single sign-off has begun across the three
+    scopes this team owns. Consolidation Manager, Journal Overview and Workflow Validations
+    (Group) are all outstanding for each:</p>
+    <ul class="steps">
+      <li>LSPG2700 / LSPG2750 / LSPG3500 — Consolidation Manager · Journal Overview · Workflow Validations (Group)</li>
+    </ul>
+  </div>
+
+  <h3>LSPG1100 — partial (7 open, 2 done)</h3>
+  <div class="ocard part">
+    <div class="oh"><div><div class="on">LSPG1100</div>
+      <div class="os">owns LSPG1100, LSPG2100, LSPG2400 · last actor ln@sp-medical.dk</div></div>
+      <span class="tag open">7 open</span></div>
+    <div class="progress"><i style="width:22%;background:var(--secondary)"></i><i style="width:78%;background:var(--danger)"></i></div>
+    <p class="small" style="margin:6px 0 0">This team has cleared its own Consolidation Manager
+    and Journal Overview but stalled on the rest. Outstanding:</p>
+    <ul class="steps">
+      <li>LSPG1100 — Workflow Validations (Group)</li>
+      <li>LSPG2100 — Consolidation Manager · Journal Overview · Workflow Validations (Group)</li>
+      <li>LSPG2400 — Consolidation Manager · Journal Overview · Workflow Validations (Group)</li>
+    </ul>
+  </div>
+
+  <h3>LSPG4700 — partial (5 open, 1 done)</h3>
+  <div class="ocard part">
+    <div class="oh"><div><div class="on">LSPG4700</div>
+      <div class="os">owns LSPG4700, LSPG6100 · last actor maso@tinby.dk</div></div>
+      <span class="tag open">5 open</span></div>
+    <div class="progress"><i style="width:17%;background:var(--secondary)"></i><i style="width:83%;background:var(--danger)"></i></div>
+    <p class="small" style="margin:6px 0 0">Only its own Consolidation Manager is done; the
+    second scope (LSPG6100) is untouched. Outstanding:</p>
+    <ul class="steps">
+      <li>LSPG4700 — Journal Overview · Workflow Validations (Group)</li>
+      <li>LSPG6100 — Consolidation Manager · Journal Overview · Workflow Validations (Group)</li>
+    </ul>
+  </div>
+
+  <h3>LSPG5500 &amp; LSPG5800 — not started (3 open each)</h3>
+  <div class="ocard crit">
+    <div class="oh"><div><div class="on">LSPG5500 · LSPG5800</div>
+      <div class="os">single-scope owners · no last actor recorded</div></div>
+      <span class="tag open">3 + 3 open</span></div>
+    <p class="small" style="margin:6px 0 0">Both teams own a single scope and have not begun.
+    All three sign-off steps (Consolidation Manager, Journal Overview, Workflow Validations)
+    are open for each.</p>
+  </div>
+
+  <div class="note">
+    <div class="nt">✓ Cleared owners — no action needed</div>
+    <strong>SPG Admin</strong> completed all five group-preparation steps (Exchange Rates,
+    Scope of Consolidation, Bring Balances Forward, Initialize Permanent Journal Entries,
+    Workflow Validations) via avh@ and joba@sp-group.dk. <strong>LSPG2600</strong>
+    (Lotte.Hansen@medicopack.com) and <strong>LSPG7600</strong> (sino@ide-pro.dk) each
+    cleared all three of their consolidation sign-offs.
+  </div>
+
+  <!-- ENTITY VOLUME -->
+  <h2><span class="num">04</span>Open tasks by entity — volume view</h2>
+  <p class="lead">Active minus Completed across all phases. This is where the 143 lives.</p>
+
+  <p>The accountability view above tracks the consolidation sign-off steps; the volume view
+  below counts <em>all</em> outstanding tasks per entity, the bulk of which sit in Month-end
+  closing. The two views agree on the top concern — <strong>LSPG2700</strong> leads on both —
+  but the volume lens surfaces additional load at <strong>LSPG1100</strong> and
+  <strong>LSPG4700</strong> that a sign-off-only view would understate.</p>
+
+  <div style="margin:18px 0">
+    <div class="barrow"><div class="nm">LSPG2700</div><div class="track"><i style="width:100%"></i></div><div class="n">43</div></div>
+    <div class="barrow"><div class="nm">LSPG1100</div><div class="track"><i style="width:72%"></i></div><div class="n">31</div></div>
+    <div class="barrow"><div class="nm">LSPG4700</div><div class="track"><i style="width:63%"></i></div><div class="n">27</div></div>
+    <div class="barrow"><div class="nm">LSPG5500</div><div class="track"><i style="width:21%"></i></div><div class="n">9</div></div>
+    <div class="barrow"><div class="nm">LSPG2100</div><div class="track"><i style="width:14%"></i></div><div class="n">6</div></div>
+    <div class="barrow"><div class="nm">LSPG5800</div><div class="track"><i style="width:14%"></i></div><div class="n">6</div></div>
+    <div class="barrow"><div class="nm">LSPG6100</div><div class="track"><i style="width:14%"></i></div><div class="n">6</div></div>
+    <div class="barrow"><div class="nm">LSPG2400</div><div class="track"><i style="width:9%"></i></div><div class="n">4</div></div>
+    <div class="barrow"><div class="nm">LSPG7300</div><div class="track"><i style="width:9%"></i></div><div class="n">4</div></div>
+    <div class="barrow"><div class="nm">SPG4000</div><div class="track"><i style="width:9%"></i></div><div class="n">4</div></div>
+    <div class="barrow"><div class="nm">LSPG4100</div><div class="track"><i style="width:5%"></i></div><div class="n">2</div></div>
+    <div class="barrow"><div class="nm">SPG1000</div><div class="track"><i style="width:3%"></i></div><div class="n">1</div></div>
+    <div class="barrow done"><div class="nm">LSPG2600</div><div class="track"><i style="width:100%"></i></div><div class="n">✓</div></div>
+    <div class="barrow done"><div class="nm">LSPG7200</div><div class="track"><i style="width:100%"></i></div><div class="n">✓</div></div>
+    <div class="barrow done"><div class="nm">LSPG7600</div><div class="track"><i style="width:100%"></i></div><div class="n">✓</div></div>
+    <div class="barrow done"><div class="nm">SPG7500</div><div class="track"><i style="width:100%"></i></div><div class="n">✓</div></div>
+  </div>
+  <p class="small">Red = open tasks (Active − Completed). Olive = entity fully complete. Phase
+  split at group level: Preparation 5/5 done; Month-end 394 of 537 done (143 open); Group
+  Consolidation negligible volume but carries the named-owner sign-offs.</p>
+
+  <!-- ACTIONS -->
+  <h2><span class="num">05</span>Recommended action points</h2>
+  <p class="lead">Ranked for the close administrator, most urgent first.</p>
+
+  <div class="action"><div class="n">1</div><div>
+    <div class="ab">Escalate LSPG2700 immediately — 9 open, nothing started.</div>
+    <div class="small">Owns LSPG2700, LSPG2750 and LSPG3500. No sign-off has begun on any of
+    its three scopes. This is both the largest accountability gap and the largest volume
+    (43 open tasks). Direct contact with the team lead is warranted today.</div></div></div>
+
+  <div class="action"><div class="n">2</div><div>
+    <div class="ab">Assign the 18 overdue, unowned Month-end steps.</div>
+    <div class="small">Import From ERP, Upload File, Local Accounts Values, IC Specification,
+    Capex inputs and the rest carry the 14-Jun deadline but no owner. Overdue-and-unassigned
+    is the highest-risk state because no one is accountable. Assign before chasing.</div></div></div>
+
+  <div class="action"><div class="n">3</div><div>
+    <div class="ab">Push LSPG1100 to finish — 2 of 9 done.</div>
+    <div class="small">Its own Workflow Validations plus all of LSPG2100 and LSPG2400 remain
+    open. The team is active (ln@sp-medical.dk) so a reminder, not an escalation, should
+    move it.</div></div></div>
+
+  <div class="action"><div class="n">4</div><div>
+    <div class="ab">Close out LSPG4700's second scope (LSPG6100).</div>
+    <div class="small">1 of 6 done (maso@tinby.dk). LSPG6100's three steps are untouched while
+    LSPG4700's own are nearly clear.</div></div></div>
+
+  <div class="action"><div class="n">5</div><div>
+    <div class="ab">Nudge LSPG5500 and LSPG5800 — 3 open each, not started.</div>
+    <div class="small">Single-scope owners with no progress. Small, self-contained, and quick
+    to clear once the team engages.</div></div></div>
+
+  <div class="note">
+    <div class="nt">Methodology note</div>
+    Owner, Status and last-actor are read at the Scope × Step grain under Legal Entity = <span class="mono">~</span>
+    (view <span class="mono">AI_TWF_Scope</span>); per-entity volume counts come from
+    <span class="mono">AI_TWF_LegalEntity</span>; deadlines from <span class="mono">AI_TWF_Deadlines</span>.
+    Numeric Active/Completed flags are stored per Legal Entity, while the named-owner string
+    attributes are stored only at the <span class="mono">~</span> aggregate — both grains are
+    required for a correct picture. Sign-off completion is tracked via Status = "Done", not the
+    numeric Completed count, which aggregates differently.
+  </div>
+
+  <footer>
+    <div class="c">
+      <b>Mikael Paulin</b>
+      twoday · Kapacity — Jedox EPM<br>
+      <a href="mailto:mikael.paulin@twoday.com">mikael.paulin@twoday.com</a>
+    </div>
+    <div class="meta2">
+      Group Close Status · MP_WorkflowDemo / TWF_Main<br>
+      Actual · 2026-05 YTD · generated 26 Jun 2026<br>
+      Generated with Jedox dev MCP
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>
